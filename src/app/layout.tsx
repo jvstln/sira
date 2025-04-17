@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Open_Sans } from "next/font/google";
 import "./globals.css";
+import ClientRootLayout from "@/components/layouts/client-root-layout";
 
 export const metadata: Metadata = {
   title: "Sira | Spot It, Report It, Improve It ",
@@ -19,7 +20,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${openSans.className} antialiased`}>{children}</body>
+      <body className={`${openSans.className} antialiased`}>
+        <ClientRootLayout>{children}</ClientRootLayout>
+      </body>
     </html>
   );
 }

@@ -10,17 +10,61 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Form } from "@/components/ui/form";
+import { getErrorMessage } from "@/lib/utils";
+import { userLoginSchema } from "@/schemas/user.schema";
+import { loginUser } from "@/services/api/user.api";
+import { useCurrentUser } from "@/services/hooks/use-user";
+import { UserLogin } from "@/types/user.type";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
-import React from "react";
-import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
+import {
+  FieldValues,
+  SubmitHandler,
+  useForm,
+  UseFormReturn,
+} from "react-hook-form";
+import { toast } from "sonner";
 
 const Login = () => {
-  const form = useForm();
+  const { user, isLoading } = useCurrentUser();
+  const form = useForm<UserLogin>({
+    resolver: zodResolver(userLoginSchema),
+  });
+  const router = useRouter();
 
-  const onSubmit: SubmitHandler<FieldValues> = async (values) => {
-    await new Promise((res) => setTimeout(res, 3000));
-    console.log(values);
+  if (isLoading) {
+    return (
+      <div className="absolute inset-0 bg-primary/10 flex justify-center items-center">
+        <Loader2 className="animate-spin" />
+      </div>
+    );
+  }
+
+  if (user) {
+    toast.success("Login successful", {
+      description: "Redirecting to dashboard...",
+      id: "login-success",
+    });
+    router.push("/dashboard");
+    return null;
+  }
+
+  const onSubmit: SubmitHandler<UserLogin> = async (values) => {
+    try {
+      const response = await loginUser(values);
+      console.log(response);
+      toast.success(response.message, {
+        description: "Redirecting to dashboard...",
+      });
+      router.push("/dashboard");
+    } catch (error) {
+      console.log("Error logging in", error);
+      toast.error("Login failed", {
+        description: getErrorMessage(error),
+      });
+    }
   };
 
   return (
@@ -36,7 +80,7 @@ const Login = () => {
           <CardContent>
             <form onSubmit={form.handleSubmit(onSubmit)}>
               <FormFieldWrapper
-                form={form}
+                form={form as unknown as UseFormReturn<FieldValues>}
                 input={{
                   name: "email",
                   label: "Email",
@@ -44,7 +88,7 @@ const Login = () => {
                 }}
               />
               <FormFieldWrapper
-                form={form}
+                form={form as unknown as UseFormReturn<FieldValues>}
                 input={{
                   name: "password",
                   label: "Password",

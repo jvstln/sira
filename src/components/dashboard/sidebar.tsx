@@ -2,11 +2,14 @@
 import React, { useState } from "react";
 import { LogOut, Menu, Moon, Sun } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Switch, SwitchThumb } from "@radix-ui/react-switch";
 import { Button } from "../ui/button";
 import { dashboardLinks } from "@/components/links";
+import { logoutUser } from "@/services/api/user.api";
+import { useCurrentUser } from "@/services/hooks/use-user";
+import { toast } from "sonner";
 
 const DashboardSidebar = () => (
   <>
@@ -19,7 +22,7 @@ const DesktopSidebar = () => {
   const pathname = usePathname();
 
   return (
-    <nav className="max-md:hidden w-[300px] h-screen shrink-0 overflow-y-auto flex flex-col bg-white">
+    <nav className="max-lg:hidden w-[300px] h-screen shrink-0 overflow-y-auto flex flex-col bg-white">
       <Link href="/">
         <img
           src="/images/logo.svg"
@@ -34,7 +37,7 @@ const DesktopSidebar = () => {
             <Link
               href={href}
               className={cn(
-                "flex items-center gap-4 p-4 transition duration-300",
+                "flex items-center gap-4 p-4 transition duration-300 text-sm",
                 pathname === href
                   ? "bg-primary text-primary-foreground"
                   : "hover:bg-primary/10"
@@ -50,10 +53,7 @@ const DesktopSidebar = () => {
       <div className="sidebar-footer flex flex-col gap-4 mt-auto">
         <DarkModeToggle />
 
-        <button className="flex items-center gap-4 cursor-pointer p-4 transition duration-300 text-red-700 bg-red-100 hover:bg-red-200">
-          <LogOut />
-          <span>Logout</span>
-        </button>
+        <LogoutButton screen="desktop" />
       </div>
     </nav>
   );
@@ -66,7 +66,7 @@ const MobileSidebar = () => {
   return (
     <div
       className={cn(
-        "md:hidden overflow-y-auto h-screen shrink-0",
+        "lg:hidden overflow-y-auto h-screen shrink-0",
         !collapsed && "fixed inset-0 bg-black/50"
       )}
       onClick={(e) => {
@@ -120,10 +120,7 @@ const MobileSidebar = () => {
         </ul>
         <div className="sidebar-footer flex flex-col gap-4 mt-auto">
           <DarkModeToggle />
-          <button className="flex max-md:justify-center items-center gap-4 cursor-pointer p-4 transition duration-300 text-red-700 bg-red-100 hover:bg-red-200">
-            <LogOut />
-            {!collapsed && <span>Logout</span>}
-          </button>
+          <LogoutButton screen="mobile" collapsed={collapsed} />
         </div>
       </nav>
     </div>
@@ -138,5 +135,47 @@ const DarkModeToggle = () => (
     </SwitchThumb>
   </Switch>
 );
+
+const LogoutButton: React.FC<{
+  screen: "desktop" | "mobile";
+  collapsed?: boolean;
+}> = ({ screen, collapsed }) => {
+  const router = useRouter();
+  const { user, mutate } = useCurrentUser();
+
+  const handleLogout = async () => {
+    try {
+      toast("Logging out...");
+      await logoutUser();
+      router.push("/auth/login");
+      mutate();
+    } catch (error) {
+      console.error("Error logging out", error);
+      toast.error("Error logging out");
+    }
+  };
+
+  if (screen === "desktop") {
+    return (
+      <button
+        onClick={handleLogout}
+        className="flex items-center gap-4 cursor-pointer p-4 transition duration-300 text-red-700 bg-red-100 hover:bg-red-200"
+      >
+        <LogOut />
+        <span>Logout</span>
+      </button>
+    );
+  }
+
+  return (
+    <button
+      onClick={handleLogout}
+      className="flex max-md:justify-center items-center gap-4 cursor-pointer p-4 transition duration-300 text-red-700 bg-red-100 hover:bg-red-200"
+    >
+      <LogOut />
+      {!collapsed && <span>Logout</span>}
+    </button>
+  );
+};
 
 export default DashboardSidebar;

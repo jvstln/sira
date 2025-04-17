@@ -1,6 +1,8 @@
+"use client";
 import { dashboardLinks } from "@/components/links";
+import { getCurrentUser } from "@/services/api/user.api";
+import api from "@/services/axios.config";
 import Link from "next/link";
-import React from "react";
 
 const DashboardHome = () => {
   return (
