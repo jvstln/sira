@@ -140,15 +140,14 @@ const LogoutButton: React.FC<{
   screen: "desktop" | "mobile";
   collapsed?: boolean;
 }> = ({ screen, collapsed }) => {
-  const router = useRouter();
-  const { user, mutate } = useCurrentUser();
+  const { mutate } = useCurrentUser();
 
   const handleLogout = async () => {
     try {
       toast("Logging out...");
       await logoutUser();
-      router.push("/auth/login");
       mutate();
+      window.location.reload();
     } catch (error) {
       console.error("Error logging out", error);
       toast.error("Error logging out");

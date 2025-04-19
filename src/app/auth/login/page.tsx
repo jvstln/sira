@@ -18,7 +18,7 @@ import { UserLogin } from "@/types/user.type";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { redirect } from "next/navigation";
 import {
   FieldValues,
   SubmitHandler,
@@ -32,7 +32,13 @@ const Login = () => {
   const form = useForm<UserLogin>({
     resolver: zodResolver(userLoginSchema),
   });
-  const router = useRouter();
+
+  if (user) {
+    toast.success("Login successful", {
+      id: "login-success",
+    });
+    redirect("/dashboard");
+  }
 
   if (isLoading) {
     return (
@@ -42,35 +48,31 @@ const Login = () => {
     );
   }
 
-  if (user) {
-    toast.success("Login successful", {
-      description: "Redirecting to dashboard...",
-      id: "login-success",
-    });
-    router.push("/dashboard");
-    return null;
-  }
-
   const onSubmit: SubmitHandler<UserLogin> = async (values) => {
+    let isLoginSuccessful = false;
     try {
       const response = await loginUser(values);
-      console.log(response);
-      toast.success(response.message, {
+      toast(response.message, {
         description: "Redirecting to dashboard...",
+        id: "login-success",
       });
-      router.push("/dashboard");
+      isLoginSuccessful = true;
     } catch (error) {
       console.log("Error logging in", error);
       toast.error("Login failed", {
         description: getErrorMessage(error),
       });
     }
+
+    if (isLoginSuccessful) {
+      redirect("/dashboard");
+    }
   };
 
   return (
     <div className="p-4">
       <Form {...form}>
-        <Card className="max-w-150 mx-auto border-neutral-300 animate-in fade-in duration-500">
+        <Card className="max-w-150 mx-auto border-neutral-300">
           <CardHeader>
             <CardTitle>Login to your account</CardTitle>
             <CardDescription>
