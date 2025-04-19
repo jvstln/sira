@@ -35,6 +35,7 @@ import { registerUser } from "@/services/api/user.api";
 import { UserRegister } from "@/types/user.type";
 import { toast } from "sonner";
 import { getErrorMessage } from "@/lib/utils";
+import Image from "next/image";
 
 const Signup = () => {
   const [step, setStep] = useState(1);
@@ -169,7 +170,13 @@ const Signup = () => {
                   <hr className="grow border-neutral-300" />
                 </div>
                 <Button variant="outline">
-                  Continue with <img src="/images/google.svg" alt="Google" />
+                  Continue with
+                  <Image
+                    src="/images/google.svg"
+                    alt="Google"
+                    width={65}
+                    height={22}
+                  />
                 </Button>
               </>
             )}

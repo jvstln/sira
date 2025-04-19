@@ -2,6 +2,7 @@ import React from "react";
 import { MousePointer2 } from "lucide-react";
 import { Button } from "../ui/button";
 import Link from "next/link";
+import Image from "next/image";
 
 const summary = [
   { label: "Issues Fixed", value: "250 +" },
@@ -34,10 +35,12 @@ const HeroSection = () => {
           </Button>
 
           <div className="image-wrapper p-3 rounded-md bg-primary/30">
-            <img
+            <Image
               src="/images/woman-sitting-and-working-on-laptop.png"
               alt=""
               className="hero-image w-full rounded-md"
+              width={3508}
+              height={1740}
             />
           </div>
         </div>

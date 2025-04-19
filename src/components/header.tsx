@@ -4,16 +4,19 @@ import { Button } from "./ui/button";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 const Header = () => {
   return (
     <header className="@container p-4 md:px-8 bg-white border-b border-neutral-300">
       <div className="container mx-auto flex items-center justify-between">
         <Link href="/">
-          <img
+          <Image
             src="/images/logo.svg"
             alt="Sira Logo"
             className="logo max-md:w-16"
+            width={108}
+            height={33}
           />
         </Link>
 
@@ -80,10 +83,12 @@ const MobileNav = () => {
           >
             <li className="py-4">
               <Link href="/">
-                <img
+                <Image
                   src="/images/logo.svg"
                   alt="Sira Logo"
                   className="logo max-md:w-16 mx-auto"
+                  width={108}
+                  height={33}
                 />
               </Link>
             </li>

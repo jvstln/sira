@@ -17,6 +17,7 @@ import { useCurrentUser } from "@/services/hooks/use-user";
 import { UserLogin } from "@/types/user.type";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import {
@@ -131,7 +132,13 @@ const Login = () => {
               <hr className="grow border-neutral-300" />
             </div>
             <Button variant="outline">
-              Continue with <img src="/images/google.svg" alt="Google" />
+              Continue with{" "}
+              <Image
+                src="/images/google.svg"
+                alt="Google"
+                width={65}
+                height={22}
+              />
             </Button>
           </CardFooter>
         </Card>

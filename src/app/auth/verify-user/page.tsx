@@ -27,7 +27,7 @@ import { userVerifyOTPSchema } from "@/schemas/user.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { UserVerifyOTP } from "@/types/user.type";
 import { verifyUser } from "@/services/api/user.api";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -141,4 +141,18 @@ const VerifyUser = () => {
   );
 };
 
-export default VerifyUser;
+const VerifyUserSuspenseWrapper = () => {
+  return (
+    <Suspense
+      fallback={
+        <div className="absolute inset-0 bg-primary/10 flex justify-center items-center">
+          <Loader2 className="animate-spin" />
+        </div>
+      }
+    >
+      <VerifyUser />
+    </Suspense>
+  );
+};
+
+export default VerifyUserSuspenseWrapper;

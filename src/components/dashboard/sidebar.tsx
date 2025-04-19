@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { LogOut, Menu, Moon, Sun } from "lucide-react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Switch, SwitchThumb } from "@radix-ui/react-switch";
 import { Button } from "../ui/button";
@@ -10,6 +10,7 @@ import { dashboardLinks } from "@/components/links";
 import { logoutUser } from "@/services/api/user.api";
 import { useCurrentUser } from "@/services/hooks/use-user";
 import { toast } from "sonner";
+import Image from "next/image";
 
 const DashboardSidebar = () => (
   <>
@@ -24,10 +25,12 @@ const DesktopSidebar = () => {
   return (
     <nav className="max-lg:hidden w-[300px] h-screen shrink-0 overflow-y-auto flex flex-col bg-white">
       <Link href="/">
-        <img
+        <Image
           src="/images/logo.svg"
           alt="Sira Logo"
           className="logo w-16 py-10 mx-auto"
+          width={108}
+          height={33}
         />
       </Link>
 
@@ -93,10 +96,12 @@ const MobileSidebar = () => {
           <Menu />
         </Button>
         <Link href="/">
-          <img
+          <Image
             src="/images/logo.svg"
             alt="Sira Logo"
             className={cn("logo py-5 mx-auto", collapsed ? "w-12" : "w-16")}
+            width={108}
+            height={33}
           />
         </Link>
         <ul>
