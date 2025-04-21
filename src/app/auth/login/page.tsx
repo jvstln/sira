@@ -29,7 +29,7 @@ import {
 import { toast } from "sonner";
 
 const Login = () => {
-  const { user, isLoading } = useCurrentUser();
+  const { user, isLoading } = useCurrentUser(true);
   const form = useForm<UserLogin>({
     resolver: zodResolver(userLoginSchema),
   });
@@ -37,6 +37,7 @@ const Login = () => {
   if (user) {
     toast.success("Login successful", {
       id: "login-success",
+      description: "",
     });
     redirect("/dashboard");
   }
