@@ -1,5 +1,24 @@
 import { z } from "zod";
 
+export enum ReportStatus {
+  PENDING = "pending",
+  RESOLVED = "resolved",
+}
+
+export interface Report {
+  _id: string;
+  userId: string;
+  evidence: Array<string>;
+  issueType: string;
+  location: string;
+  description: string;
+  status: ReportStatus;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type NewReportFormValues = z.infer<typeof newReportFormSchema>;
+
 export const newReportFormSchema = z.object({
   issueType: z.string().min(1, "Please select an issue type"),
   location: z.string().min(1, "Please enter a location"),

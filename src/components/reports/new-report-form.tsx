@@ -21,8 +21,10 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Loader2, UploadCloud } from "lucide-react";
-import { NewReportFormValues } from "@/types/report.type";
-import { newReportFormSchema } from "@/schemas/report.schema";
+import {
+  newReportFormSchema,
+  type NewReportFormValues,
+} from "@/schemas/report.schema";
 import { FormFieldWrapper } from "../form-elements";
 import { createReport } from "@/services/api/report.api";
 import { toast } from "sonner";

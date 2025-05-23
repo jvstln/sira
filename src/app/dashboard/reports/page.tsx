@@ -1,10 +1,23 @@
 "use client";
+import { useState, Fragment } from "react";
 import { SubHeader } from "@/components/dashboard/header";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
-import React, { useState } from "react";
+import { Report, ReportStatus } from "@/schemas/report.schema";
+import { useReports } from "@/services/hooks/use-reports";
+import Spinner from "@/components/ui/spinner";
 
-const reports = [
+const reportsDummyData = [
   {
     id: 1,
     category: "Hardware",
@@ -168,18 +181,28 @@ const reports = [
 ];
 
 const Reports = () => {
-  const [mode, setMode] = useState<"resolved" | "pending">("resolved");
+  const [mode, setMode] = useState<ReportStatus>(ReportStatus.PENDING);
+  const {
+    reports: unfilteredReports,
+    isReportsLoading,
+    reportsError,
+  } = useReports();
+
+  const reports = unfilteredReports?.filter((report) => report.status === mode);
 
   return (
     <div>
       <SubHeader
         title={
-          <>Your {mode === "resolved" ? "submitted" : "pending"} reports</>
+          <>
+            Your {mode === ReportStatus.RESOLVED ? "submitted" : "pending"}{" "}
+            reports
+          </>
         }
       />
 
       <div className="text-center my-8">
-        {mode === "resolved"
+        {mode === ReportStatus.RESOLVED
           ? "View your resolved reports here."
           : "View reports that are still pending "}
       </div>
@@ -189,49 +212,91 @@ const Reports = () => {
           variant="ghost"
           className={cn(
             "rounded-none border-b w-full hover:bg-primary/10",
-            mode === "resolved" && "bg-primary/20 border-primary"
+            mode === ReportStatus.PENDING && "bg-primary/20 border-primary"
           )}
-          onClick={() => setMode("resolved")}
+          onClick={() => setMode(ReportStatus.PENDING)}
         >
-          Resolved
+          Pending
         </Button>
         <Button
           variant="ghost"
           className={cn(
             "rounded-none border-b w-full hover:bg-primary/10",
-            mode === "pending" && "bg-primary/20 border-primary"
+            mode === ReportStatus.RESOLVED && "bg-primary/20 border-primary"
           )}
-          onClick={() => setMode("pending")}
+          onClick={() => setMode(ReportStatus.RESOLVED)}
         >
-          Pending
+          Resolved
         </Button>
       </div>
 
       <div className="reports mt-10">
-        {reports
-          .filter((report) => report.status === mode)
-          .map(({ id, title, date, status }) => (
-            <React.Fragment key={id}>
-              <div className="flex justify-between w-full py-2 hover:bg-neutral-200">
+        {reportsError && (
+          <p className="text-center text-red-600">
+            An error occurred while loading reports - {reportsError}
+          </p>
+        )}
+        {isReportsLoading && (
+          <p>
+            <Spinner />
+          </p>
+        )}
+        {reports?.length === 0 && (
+          <p className="text-center">No reports found</p>
+        )}
+        {reports?.map((report) => (
+          <Fragment key={report._id}>
+            <ReportDialog report={report}>
+              <div className="flex justify-between w-full p-2 hover:bg-neutral-200">
                 <div className="content capitalize flex flex-col font-bold text-lg">
-                  {title}
-                  <div className="date text-sm font-normal">{date}</div>
+                  {report.issueType}
+                  <div className="date text-sm font-normal">
+                    {new Date(report.createdAt).toLocaleString()}
+                  </div>
                 </div>
                 <div
                   className={cn(
                     "status p-1 rounded text-sm self-center uppercase",
-                    mode === "resolved" ? "bg-primary/20" : "bg-amber-200"
+                    mode === ReportStatus.RESOLVED
+                      ? "bg-primary/20"
+                      : "bg-amber-200"
                   )}
                 >
-                  {status}
+                  {report.status}
                 </div>
               </div>
-              <hr className="border-neutral-500" />
-            </React.Fragment>
-          ))}
+            </ReportDialog>
+            <hr className="border-neutral-500" />
+          </Fragment>
+        ))}
       </div>
     </div>
   );
 };
 
+const ReportDialog: React.FC<{ children: React.ReactNode; report: Report }> = ({
+  children,
+  report,
+}) => {
+  return (
+    <Dialog>
+      <DialogTrigger className="cursor-pointer" asChild>
+        {children}
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle className="capitalize text-center">
+            {report.issueType}
+          </DialogTitle>
+          <DialogDescription>{report.description}</DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button variant="outline">Close</Button>
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+};
 export default Reports;

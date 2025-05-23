@@ -1,4 +1,4 @@
-import { NewReportFormValues } from "@/types/report.type";
+import { NewReportFormValues, Report } from "@/schemas/report.schema";
 import api from "../axios.config";
 
 export const createReport = async (newReportFormData: NewReportFormValues) => {
@@ -11,8 +11,8 @@ export const createReport = async (newReportFormData: NewReportFormValues) => {
   return response.data;
 };
 
-export const getReports = async () => {
+export async function getReports(): Promise<Report[]> {
   const response = await api.get("/report/get-my-report");
 
-  return response.data;
-};
+  return response.data.data;
+}
