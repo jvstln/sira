@@ -1,13 +1,15 @@
-import React from "react";
 import { Button } from "../ui/button";
 import { Bell, ChevronDown, FilePlus2, User } from "lucide-react";
+import Link from "next/link";
 
 const DashboardHeader = () => {
   return (
     <div className="flex justify-between max-sm:flex-col gap-4 py-8 max-sm:py-4 px-4 bg-white">
-      <Button>
-        <FilePlus2 />
-        Make a report
+      <Button asChild>
+        <Link href="/dashboard/reports/new">
+          <FilePlus2 />
+          Make a report
+        </Link>
       </Button>
 
       <div className="self-end profile flex items-center gap-2">

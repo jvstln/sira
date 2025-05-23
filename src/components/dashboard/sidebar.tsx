@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { LogOut, Menu, Moon, Sun } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Switch, SwitchThumb } from "@radix-ui/react-switch";
 import { Button } from "../ui/button";
@@ -146,13 +146,14 @@ const LogoutButton: React.FC<{
   collapsed?: boolean;
 }> = ({ screen, collapsed }) => {
   const { mutate } = useCurrentUser();
+  const router = useRouter();
 
   const handleLogout = async () => {
     try {
       toast("Logging out...");
       await logoutUser();
       mutate();
-      window.location.reload();
+      router.push("/");
     } catch (error) {
       console.error("Error logging out", error);
       toast.error("Error logging out");

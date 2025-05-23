@@ -15,11 +15,8 @@ export const userRegisterSchemaTwo = z.object({
   name: z.string().min(3),
   level: z
     .string()
-    .regex(
-      /^\d{3}l$/i,
-      "Level must contain a 3 digit value ending with an L eg. 100L"
-    )
-    .transform((value) => value.toUpperCase()),
+    .regex(/^\d{3}$/i, "Level must contain a 3 digit value eg. 100")
+    .transform((value) => value + "L"),
 });
 
 export const userVerifyOTPSchema = z.object({

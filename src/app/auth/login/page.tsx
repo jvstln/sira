@@ -10,16 +10,15 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Form } from "@/components/ui/form";
-import { getErrorMessage } from "@/lib/utils";
+import { getErrorMessage, handleServerValidationError } from "@/lib/utils";
 import { userLoginSchema } from "@/schemas/user.schema";
 import { loginUser } from "@/services/api/user.api";
-import { useCurrentUser } from "@/services/hooks/use-user";
 import { UserLogin } from "@/types/user.type";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { redirect } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import {
   FieldValues,
   SubmitHandler,
@@ -29,45 +28,27 @@ import {
 import { toast } from "sonner";
 
 const Login = () => {
-  const { user, isLoading } = useCurrentUser(true);
   const form = useForm<UserLogin>({
     resolver: zodResolver(userLoginSchema),
   });
-
-  if (user) {
-    toast.success("Login successful", {
-      id: "login-success",
-      description: "",
-    });
-    redirect("/dashboard");
-  }
-
-  if (isLoading) {
-    return (
-      <div className="absolute inset-0 bg-primary/10 flex justify-center items-center">
-        <Loader2 className="animate-spin" />
-      </div>
-    );
-  }
+  const router = useRouter();
 
   const onSubmit: SubmitHandler<UserLogin> = async (values) => {
-    let isLoginSuccessful = false;
     try {
       const response = await loginUser(values);
       toast(response.message, {
-        description: "Redirecting to dashboard...",
+        description: "Login Successful",
         id: "login-success",
       });
-      isLoginSuccessful = true;
+      router.push("/dashboard");
     } catch (error) {
+      const errorMessage = getErrorMessage(error);
       console.log("Error logging in", error);
       toast.error("Login failed", {
-        description: getErrorMessage(error),
+        description: errorMessage,
       });
-    }
 
-    if (isLoginSuccessful) {
-      redirect("/dashboard");
+      handleServerValidationError(error, form);
     }
   };
 

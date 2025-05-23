@@ -6,9 +6,9 @@ import { redirect } from "next/navigation";
 const AuthenticatedLayout: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const { user, isLoading } = useCurrentUser();
+  const { user, isUserLoading } = useCurrentUser(true);
 
-  if (isLoading) {
+  if (isUserLoading) {
     return (
       <div className="absolute inset-0 bg-primary/10 flex justify-center items-center">
         <Loader2 className="animate-spin" />

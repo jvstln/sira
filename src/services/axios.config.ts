@@ -1,9 +1,8 @@
-import { env } from "@/lib/env.config";
 import axios from "axios";
 import { parseCookies } from "nookies";
 
 const api = axios.create({
-  baseURL: env.API_URL,
+  baseURL: process.env.NEXT_PUBLIC_API_URL,
   headers: {
     "Content-Type": "application/json",
   },
@@ -16,7 +15,7 @@ api.interceptors.request.use((config) => {
   const isLocalhost =
     typeof window !== "undefined" && window.location.hostname === "localhost";
 
-  const token = cookies.token || (isLocalhost ? env.TOKEN : undefined);
+  const token = cookies.token || (isLocalhost ? process.env.TOKEN : undefined);
 
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;

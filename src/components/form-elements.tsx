@@ -107,6 +107,7 @@ export const FileFieldControl: React.FC<FieldControl> = ({
           src={imagePreview}
           alt="File Preview"
           className="image-preview w-full h-full object-cover rounded-xl"
+          fill
         />
       )}
 
