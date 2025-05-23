@@ -33,16 +33,17 @@ const NewReportForm = () => {
     resolver: zodResolver(newReportFormSchema),
     defaultValues: {
       description: "",
+      issueType: "",
+      location: "",
     },
   });
 
   const onSubmit = async (data: NewReportFormValues) => {
-    console.log(data);
-
     try {
       const response = await createReport(data);
       console.log(response);
       toast.success("Report created successfully");
+      form.reset();
     } catch (error) {
       console.error("Error creating report", error);
       toast.error("Failed to create report", {
@@ -116,7 +117,7 @@ const NewReportForm = () => {
 
         <FormField
           control={form.control}
-          name="evidence"
+          name="files"
           render={({ field: { value, onChange, ...field } }) => (
             <FormItem>
               <FormLabel>Evidence</FormLabel>

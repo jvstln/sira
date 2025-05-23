@@ -1,8 +1,13 @@
+"use client";
 import { Button } from "../ui/button";
 import { Bell, ChevronDown, FilePlus2, User } from "lucide-react";
 import Link from "next/link";
+import Spinner from "../ui/spinner";
+import { useCurrentUser } from "@/services/hooks/use-user";
 
 const DashboardHeader = () => {
+  const { user, isUserLoading } = useCurrentUser();
+
   return (
     <div className="flex justify-between max-sm:flex-col gap-4 py-8 max-sm:py-4 px-4 bg-white">
       <Button asChild>
@@ -16,13 +21,19 @@ const DashboardHeader = () => {
         <Button variant="ghost" size="icon" className="rounded-full">
           <Bell />
         </Button>
-        <div className="profile-picture rounded-full border border-neutral-400 p-0.5 size-6">
-          <User className="size-full" />
-        </div>
-        <span className="text-sm text-center">Hi Abuchi</span>
-        <Button variant="ghost" size="icon">
-          <ChevronDown />
-        </Button>
+        {isUserLoading ? (
+          <Spinner />
+        ) : (
+          <>
+            <div className="profile-picture rounded-full border border-neutral-400 p-0.5 size-6">
+              <User className="size-full" />
+            </div>
+            <span className="text-sm text-center">Hi {user?.name}</span>
+            <Button variant="ghost" size="icon">
+              <ChevronDown />
+            </Button>
+          </>
+        )}
       </div>
     </div>
   );

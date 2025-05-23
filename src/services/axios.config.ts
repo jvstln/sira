@@ -7,6 +7,9 @@ const api = axios.create({
     "Content-Type": "application/json",
   },
   withCredentials: true,
+  formSerializer: {
+    indexes: null,
+  },
 });
 
 api.interceptors.request.use((config) => {

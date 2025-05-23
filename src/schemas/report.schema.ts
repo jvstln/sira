@@ -1,16 +1,39 @@
 import { z } from "zod";
 
 export const newReportFormSchema = z.object({
-  issueType: z.string({
-    required_error: "Please select an issue type",
-  }),
-  location: z.string({
-    required_error: "Please enter a location",
-  }),
-  evidence: z.instanceof(FileList).optional(),
-  description: z
-    .string({
-      required_error: "Please provide a description",
-    })
-    .min(10, "Description must be at least 10 characters"),
+  issueType: z.string().min(1, "Please select an issue type"),
+  location: z.string().min(1, "Please enter a location"),
+  files: z
+    .instanceof(FileList)
+    .transform((filelist: FileList) => Array.from(filelist))
+    .optional()
+    .superRefine((value, ctx) => {
+      if (value && value.length > 5) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "You can only upload up to 5 files",
+          path: ["files"],
+        });
+      }
+
+      for (const file of value ?? []) {
+        if (file.size > 5 * 1024 * 1024) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "File size must be less than 5MB",
+            path: ["files"],
+          });
+        }
+
+        if (!["image/png", "image/jpg", "image/jpeg"].includes(file.type)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message:
+              "File must be an image. Supported formats: .png, .jpg, .jpeg",
+            path: ["files"],
+          });
+        }
+      }
+    }),
+  description: z.string().min(5, "Description must be at least 5 characters"),
 });

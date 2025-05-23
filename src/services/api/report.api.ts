@@ -4,7 +4,7 @@ import api from "../axios.config";
 export const createReport = async (newReportFormData: NewReportFormValues) => {
   const response = await api.post("/report/user", newReportFormData, {
     headers: {
-      "Content-Type": "multipart/formdata",
+      "Content-Type": "multipart/form-data",
     },
   });
 
