@@ -23,37 +23,20 @@ import { Textarea } from "@/components/ui/textarea";
 import { Loader2, UploadCloud } from "lucide-react";
 import {
   newReportFormSchema,
-  type NewReportFormValues,
+  NewReportFormValues,
 } from "@/schemas/report.schema";
 import { FormFieldWrapper } from "../form-elements";
 import { createReport } from "@/services/api/report.api";
 import { toast } from "sonner";
 import { getErrorMessage } from "@/lib/utils";
+import React from "react";
 
-const NewReportForm = () => {
-  const form = useForm<NewReportFormValues>({
-    resolver: zodResolver(newReportFormSchema),
-    defaultValues: {
-      description: "",
-      issueType: "",
-      location: "",
-    },
-  });
+interface ReportFormProps {
+  onSubmit: (data: NewReportFormValues) => Promise<void> | void;
+  form: UseFormReturn<NewReportFormValues>;
+}
 
-  const onSubmit = async (data: NewReportFormValues) => {
-    try {
-      const response = await createReport(data);
-      console.log(response);
-      toast.success("Report created successfully");
-      form.reset();
-    } catch (error) {
-      console.error("Error creating report", error);
-      toast.error("Failed to create report", {
-        description: getErrorMessage(error),
-      });
-    }
-  };
-
+const ReportForm: React.FC<ReportFormProps> = ({ onSubmit, form }) => {
   return (
     <Form {...form}>
       <form
@@ -202,4 +185,4 @@ const NewReportForm = () => {
   );
 };
 
-export default NewReportForm;
+export default ReportForm;

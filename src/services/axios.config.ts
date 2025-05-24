@@ -12,18 +12,20 @@ const api = axios.create({
   },
 });
 
-api.interceptors.request.use((config) => {
+api.interceptors.request.use(async (config) => {
   const cookies = parseCookies();
 
-  const isLocalhost =
-    typeof window !== "undefined" && window.location.hostname === "localhost";
-
-  const token = cookies.token || (isLocalhost ? process.env.TOKEN : undefined);
+  const token = cookies.token;
 
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
 });
+
+export const dynamicallySetToken = async (token?: string) => {
+  if (!token) return;
+  api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+};
 
 export default api;

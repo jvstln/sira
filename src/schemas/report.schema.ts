@@ -56,3 +56,5 @@ export const newReportFormSchema = z.object({
     }),
   description: z.string().min(5, "Description must be at least 5 characters"),
 });
+
+export const updateReportFormSchema = newReportFormSchema.partial();

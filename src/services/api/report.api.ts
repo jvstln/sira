@@ -16,3 +16,24 @@ export async function getReports(): Promise<Report[]> {
 
   return response.data.data;
 }
+
+export async function getReport(reportId: string): Promise<Report> {
+  const response = await api.get(`/report/get-my-report/${reportId}`);
+
+  return response.data.data;
+}
+
+export const updateReport = async (
+  reportId: string,
+  data: Partial<NewReportFormValues>
+) => {
+  const response = await api.put(`/report/update/${reportId}`, data);
+
+  return response.data;
+};
+
+export const deleteReport = async (reportId: string) => {
+  const response = await api.delete(`/report/delete/${reportId}`);
+
+  return response.data;
+};
