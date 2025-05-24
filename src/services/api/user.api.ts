@@ -13,7 +13,7 @@ export const verifyUser = async (data: UserVerifyOTP) => {
 
 export const loginUser = async (data: UserLogin) => {
   const response = await api.post("/auth/user/login", data);
-  return response.data.data;
+  return response.data;
 };
 
 export const getCurrentUser = async () => {
