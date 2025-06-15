@@ -1,3 +1,4 @@
+import { getErrorMessage } from "@/lib/utils";
 import axios from "axios";
 import { parseCookies } from "nookies";
 
@@ -22,6 +23,17 @@ api.interceptors.request.use(async (config) => {
   }
   return config;
 });
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    console.log("Error: ", error.config.url, error.config.method, error);
+    return Promise.reject({
+      ...error,
+      message: getErrorMessage(error),
+    });
+  }
+);
 
 export const dynamicallySetToken = async (token?: string) => {
   if (!token) return;

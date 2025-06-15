@@ -237,11 +237,13 @@ const Reports = () => {
 
       <div className="reports mt-10">
         {reportsError && (
-          <p className="text-center text-red-600">
-            An error occurred while loading reports - {reportsError}
-          </p>
+          <p className="text-center text-red-600">{reportsError.message}</p>
         )}
-        {isReportsLoading && <Spinner />}
+        {isReportsLoading && (
+          <div>
+            <Spinner className="mx-auto block" />
+          </div>
+        )}
         {reports?.length === 0 && (
           <p className="text-center">No reports found</p>
         )}

@@ -40,7 +40,8 @@ const Login = () => {
         description: "Login Successful",
         id: "login-success",
       });
-      router.push("/dashboard");
+      // router.push("/dashboard");
+      window.location.assign('/dashboard')
     } catch (error) {
       const errorMessage = getErrorMessage(error);
       console.log("Error logging in", error);
