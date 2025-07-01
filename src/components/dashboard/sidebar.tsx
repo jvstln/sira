@@ -1,8 +1,8 @@
 "use client";
-import React, { useState } from "react";
-import { LogOut, Menu, Moon, Sun } from "lucide-react";
+import React from "react";
+import { LogOut, Moon, Sun, XIcon } from "lucide-react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Switch, SwitchThumb } from "@radix-ui/react-switch";
 import { Button } from "../ui/button";
@@ -12,10 +12,15 @@ import { useCurrentUser } from "@/services/hooks/use-user";
 import { toast } from "sonner";
 import Image from "next/image";
 
-const DashboardSidebar = () => (
+type MobileNavProps = {
+  isMobileNavOpen: boolean;
+  setIsMobileNavOpen: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
+const DashboardSidebar = (props: MobileNavProps) => (
   <>
     <DesktopSidebar />
-    <MobileSidebar />
+    <MobileSidebar {...props} />
   </>
 );
 
@@ -62,44 +67,49 @@ const DesktopSidebar = () => {
   );
 };
 
-const MobileSidebar = () => {
-  const [collapsed, setCollapsed] = useState(true);
+const MobileSidebar = (props: MobileNavProps) => {
   const pathname = usePathname();
 
   return (
     <div
       className={cn(
         "lg:hidden overflow-y-auto h-screen shrink-0",
-        !collapsed && "fixed inset-0 bg-black/50"
+        props.isMobileNavOpen && "fixed inset-0 bg-black/50"
       )}
       onClick={(e) => {
         if (
           e.target instanceof HTMLElement &&
           !e.target.closest(".sidebar-mobile")
         ) {
-          setCollapsed(true);
+          props.setIsMobileNavOpen(false);
         }
       }}
     >
       <nav
         className={cn(
           "sidebar-mobile h-full flex flex-col bg-white transition-width duration-300",
-          collapsed ? "w-16" : "w-[300px]"
+          props.isMobileNavOpen ? "w-[300px]" : "w-0"
         )}
       >
         <Button
           variant="outline"
           size="icon"
-          className={cn("mt-4", collapsed ? "mx-auto" : "ml-auto mr-4")}
-          onClick={() => setCollapsed(!collapsed)}
+          className={cn(
+            "mt-4",
+            props.isMobileNavOpen ? "ml-auto mr-4" : "mx-auto"
+          )}
+          onClick={() => props.setIsMobileNavOpen(!props.isMobileNavOpen)}
         >
-          <Menu />
+          <XIcon />
         </Button>
         <Link href="/">
           <Image
             src="/images/logo.svg"
             alt="Sira Logo"
-            className={cn("logo py-5 mx-auto", collapsed ? "w-12" : "w-16")}
+            className={cn(
+              "logo py-5 mx-auto",
+              !props.isMobileNavOpen ? "w-12" : "w-16"
+            )}
             width={108}
             height={33}
           />
@@ -114,18 +124,18 @@ const MobileSidebar = () => {
                   pathname === href
                     ? "bg-primary text-primary-foreground"
                     : "hover:bg-primary/10",
-                  collapsed && "justify-center"
+                  !props.isMobileNavOpen && "justify-center"
                 )}
               >
                 {icon}
-                {!collapsed && <span>{name}</span>}
+                {props.isMobileNavOpen && <span>{name}</span>}
               </Link>
             </li>
           ))}
         </ul>
         <div className="sidebar-footer flex flex-col gap-4 mt-auto">
           <DarkModeToggle />
-          <LogoutButton screen="mobile" collapsed={collapsed} />
+          <LogoutButton screen="mobile" collapsed={props.isMobileNavOpen} />
         </div>
       </nav>
     </div>
