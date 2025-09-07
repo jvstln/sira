@@ -8,7 +8,12 @@ import {
   FormDescription,
   FormMessage,
 } from "./ui/form";
-import { useForm, ControllerRenderProps, FieldValues } from "react-hook-form";
+import {
+  useForm,
+  ControllerRenderProps,
+  FieldValues,
+  UseFormReturn,
+} from "react-hook-form";
 import { cn } from "@/lib/utils";
 import {
   Eye,
@@ -29,7 +34,7 @@ import {
 import { Textarea } from "./ui/textarea";
 import { Input } from "./ui/input";
 import Image from "next/image";
-import { InputProps } from "@/lib/types";
+import { InputProps } from "@/types/form.type";
 
 interface FieldControl {
   form: ReturnType<typeof useForm>;
@@ -102,6 +107,7 @@ export const FileFieldControl: React.FC<FieldControl> = ({
           src={imagePreview}
           alt="File Preview"
           className="image-preview w-full h-full object-cover rounded-xl"
+          fill
         />
       )}
 
@@ -242,7 +248,7 @@ const controlMapping: Record<string, React.FC<FieldControl>> = {
 };
 
 export const FormFieldWrapper: React.FC<{
-  form: ReturnType<typeof useForm>;
+  form: UseFormReturn<FieldValues>;
   input: InputProps;
   Control?: React.FC<FieldControl>;
 }> = ({ form, input, Control }) => {

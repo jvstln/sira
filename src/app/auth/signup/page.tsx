@@ -1,4 +1,5 @@
 "use client";
+import { useState } from "react";
 import { FormFieldWrapper } from "@/components/form-elements";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,32 +12,59 @@ import {
 } from "@/components/ui/card";
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Form } from "@/components/ui/form";
+import {
+  userRegisterSchemaOne,
+  userRegisterSchemaTwo,
+} from "@/schemas/user.schema";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
-import React, { useState } from "react";
-import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
+import {
+  FieldValues,
+  SubmitHandler,
+  useForm,
+  UseFormReturn,
+} from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { registerUser } from "@/services/api/user.api";
+import { UserRegister } from "@/types/user.type";
+import { toast } from "sonner";
+import { getErrorMessage } from "@/lib/utils";
+import Image from "next/image";
 
 const Signup = () => {
-  const form = useForm();
-  const [dialogOpen, setDialogOpen] = useState(false);
   const [step, setStep] = useState(1);
+  const form = useForm<UserRegister>({
+    resolver: zodResolver(
+      step === 1 ? userRegisterSchemaOne : userRegisterSchemaTwo
+    ),
+  });
+  const [successMessage, setSuccessMessage] = useState("");
 
-  const onSubmit: SubmitHandler<FieldValues> = async (values) => {
+  const onSubmit: SubmitHandler<UserRegister> = async () => {
     if (step === 1) {
       setStep(2);
       return;
     }
 
-    await new Promise((res) => setTimeout(res, 3000));
-    console.log(values);
-    setDialogOpen(true);
+    const toastId = toast.loading("Registering...");
+    try {
+      const response = await registerUser(form.getValues());
+
+      console.log(response);
+      setSuccessMessage(response.message || "Registration successful");
+      toast.success("Registration successful", { id: toastId });
+    } catch (error) {
+      toast.error("Registration failed", {
+        id: toastId,
+        description: getErrorMessage(error),
+      });
+    }
   };
 
   return (
@@ -59,7 +87,7 @@ const Signup = () => {
               {step === 1 ? (
                 <>
                   <FormFieldWrapper
-                    form={form}
+                    form={form as unknown as UseFormReturn<FieldValues>}
                     input={{
                       name: "email",
                       label: "Email",
@@ -67,7 +95,7 @@ const Signup = () => {
                     }}
                   />
                   <FormFieldWrapper
-                    form={form}
+                    form={form as unknown as UseFormReturn<FieldValues>}
                     input={{
                       name: "password",
                       label: "Password",
@@ -75,9 +103,9 @@ const Signup = () => {
                     }}
                   />
                   <FormFieldWrapper
-                    form={form}
+                    form={form as unknown as UseFormReturn<FieldValues>}
                     input={{
-                      name: "confirm_password",
+                      name: "confirmPassword",
                       label: "Confirm Password",
                       type: "password",
                     }}
@@ -86,7 +114,7 @@ const Signup = () => {
               ) : (
                 <>
                   <FormFieldWrapper
-                    form={form}
+                    form={form as unknown as UseFormReturn<FieldValues>}
                     input={{
                       name: "name",
                       label: "Name",
@@ -94,7 +122,7 @@ const Signup = () => {
                     }}
                   />
                   <FormFieldWrapper
-                    form={form}
+                    form={form as unknown as UseFormReturn<FieldValues>}
                     input={{
                       name: "level",
                       label: "Level",
@@ -142,7 +170,13 @@ const Signup = () => {
                   <hr className="grow border-neutral-300" />
                 </div>
                 <Button variant="outline">
-                  Continue with <img src="/images/google.svg" alt="Google" />
+                  Continue with
+                  <Image
+                    src="/images/google.svg"
+                    alt="Google"
+                    width={65}
+                    height={22}
+                  />
                 </Button>
               </>
             )}
@@ -150,18 +184,21 @@ const Signup = () => {
         </Card>
       </Form>
 
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+      <Dialog
+        open={!!successMessage}
+        onOpenChange={(value) => {
+          if (!value) setSuccessMessage("");
+        }}
+      >
         <DialogContent className="text-center">
           <DialogTitle>Verify your email</DialogTitle>
-          <DialogDescription>
-            We sent an email to {form.getValues("email")}. Click the link to get
-            started.
-          </DialogDescription>
+          <DialogDescription>{successMessage}</DialogDescription>
           <DialogFooter className="sm:flex-col text-center gap-2">
             <Button asChild>
-              <Link href="/auth/login">Go to login</Link>
+              <Link href={`/auth/verify-user?email=${form.getValues("email")}`}>
+                Enter OTP
+              </Link>
             </Button>
-            <Button variant="ghost">Resend code</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

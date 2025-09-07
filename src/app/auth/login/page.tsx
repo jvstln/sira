@@ -10,23 +10,53 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Form } from "@/components/ui/form";
+import { getErrorMessage, handleServerValidationError } from "@/lib/utils";
+import { userLoginSchema } from "@/schemas/user.schema";
+import { loginUser } from "@/services/api/user.api";
+import { UserLogin } from "@/types/user.type";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
-import React from "react";
-import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
+import { redirect, useRouter } from "next/navigation";
+import {
+  FieldValues,
+  SubmitHandler,
+  useForm,
+  UseFormReturn,
+} from "react-hook-form";
+import { toast } from "sonner";
 
 const Login = () => {
-  const form = useForm();
+  const form = useForm<UserLogin>({
+    resolver: zodResolver(userLoginSchema),
+  });
+  const router = useRouter();
 
-  const onSubmit: SubmitHandler<FieldValues> = async (values) => {
-    await new Promise((res) => setTimeout(res, 3000));
-    console.log(values);
+  const onSubmit: SubmitHandler<UserLogin> = async (values) => {
+    try {
+      const response = await loginUser(values);
+      toast(response.message, {
+        description: "Login Successful",
+        id: "login-success",
+      });
+      // router.push("/dashboard");
+      window.location.assign('/dashboard')
+    } catch (error) {
+      const errorMessage = getErrorMessage(error);
+      console.log("Error logging in", error);
+      toast.error("Login failed", {
+        description: errorMessage,
+      });
+
+      handleServerValidationError(error, form);
+    }
   };
 
   return (
     <div className="p-4">
       <Form {...form}>
-        <Card className="max-w-150 mx-auto border-neutral-300 animate-in fade-in duration-500">
+        <Card className="max-w-150 mx-auto border-neutral-300">
           <CardHeader>
             <CardTitle>Login to your account</CardTitle>
             <CardDescription>
@@ -36,7 +66,7 @@ const Login = () => {
           <CardContent>
             <form onSubmit={form.handleSubmit(onSubmit)}>
               <FormFieldWrapper
-                form={form}
+                form={form as unknown as UseFormReturn<FieldValues>}
                 input={{
                   name: "email",
                   label: "Email",
@@ -44,7 +74,7 @@ const Login = () => {
                 }}
               />
               <FormFieldWrapper
-                form={form}
+                form={form as unknown as UseFormReturn<FieldValues>}
                 input={{
                   name: "password",
                   label: "Password",
@@ -85,7 +115,13 @@ const Login = () => {
               <hr className="grow border-neutral-300" />
             </div>
             <Button variant="outline">
-              Continue with <img src="/images/google.svg" alt="Google" />
+              Continue with{" "}
+              <Image
+                src="/images/google.svg"
+                alt="Google"
+                width={65}
+                height={22}
+              />
             </Button>
           </CardFooter>
         </Card>

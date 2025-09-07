@@ -6,6 +6,7 @@ import {
 import React from "react";
 import { Button } from "../ui/button";
 import Link from "next/link";
+import Image from "next/image";
 
 const steps = [
   {
@@ -27,7 +28,7 @@ const steps = [
         We are always looking to improve the website. Participate in feedback
         sessions and surveys to share your thoughts and suggestions. Your
         insights can help us make the <span className="font-bold">SIRA</span>{" "}
-        even better.",
+        even better.&quot;,
       </>
     ),
     icon: <MessageCircleHeart />,
@@ -42,7 +43,7 @@ const GetInvolvedSection = () => {
           Get Involved
         </h2>
         <p className="text-center">
-          Every Student's Voice Matters. <br /> Your input is crucial in
+          Every Student&apos;s Voice Matters. <br /> Your input is crucial in
           maintaining a safe and functional learning environment.
         </p>
       </section>
@@ -65,10 +66,12 @@ const GetInvolvedSection = () => {
           </Button>
         </div>
         <div className="image-wrapper">
-          <img
+          <Image
             src="/images/phone-mockup.png"
             alt="Phone app mockup"
             className="mockup w-90 justify-self-center"
+            width={1440}
+            height={2772}
           />
         </div>
       </section>

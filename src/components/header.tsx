@@ -2,18 +2,23 @@
 import React, { useState } from "react";
 import { Button } from "./ui/button";
 import Link from "next/link";
-import { Menu, X } from "lucide-react";
+import { Loader2, Menu, User, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
+import { useCurrentUser } from "@/services/hooks/use-user";
+import { Skeleton } from "./ui/skeleton";
 
 const Header = () => {
   return (
     <header className="@container p-4 md:px-8 bg-white border-b border-neutral-300">
       <div className="container mx-auto flex items-center justify-between">
         <Link href="/">
-          <img
+          <Image
             src="/images/logo.svg"
             alt="Sira Logo"
             className="logo max-md:w-16"
+            width={108}
+            height={33}
           />
         </Link>
 
@@ -24,14 +29,40 @@ const Header = () => {
   );
 };
 
+const AuthButton: React.FC<{ className?: string }> = ({ className }) => {
+  const { user, isUserLoading } = useCurrentUser(true);
+
+  if (isUserLoading) {
+    return (
+      <Button variant="raw" asChild>
+        <Skeleton className="text-transparent">Login</Skeleton>
+      </Button>
+    );
+  }
+
+  if (user) {
+    return (
+      <Button asChild className={cn(className)}>
+        <Link href="/dashboard">Dashboard</Link>
+      </Button>
+    );
+  }
+
+  return (
+    <>
+      <Button variant="outline" asChild className={cn(className)}>
+        <Link href="/auth/login">Login</Link>
+      </Button>
+      <Button asChild>
+        <Link href="/auth/signup">Get Started</Link>
+      </Button>
+    </>
+  );
+};
+
 const DesktopNav = () => (
   <nav className="hidden @sm:flex gap-4">
-    <Button variant="ghost" className="text-primary" asChild>
-      <Link href="/auth/login">Login</Link>
-    </Button>
-    <Button asChild>
-      <Link href="/auth/signup">Get Started</Link>
-    </Button>
+    <AuthButton />
   </nav>
 );
 
@@ -80,23 +111,16 @@ const MobileNav = () => {
           >
             <li className="py-4">
               <Link href="/">
-                <img
+                <Image
                   src="/images/logo.svg"
                   alt="Sira Logo"
                   className="logo max-md:w-16 mx-auto"
+                  width={108}
+                  height={33}
                 />
               </Link>
             </li>
-            <li>
-              <Button variant="ghost" className="w-full text-primary" asChild>
-                <Link href="/auth/login">Login</Link>
-              </Button>
-            </li>
-            <li>
-              <Button className="w-full" asChild>
-                <Link href="/auth/signup">Get Started</Link>
-              </Button>
-            </li>
+            <AuthButton />
           </ul>
 
           <Button variant="outline" size="icon" className="m-4">

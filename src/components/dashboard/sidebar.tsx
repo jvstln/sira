@@ -1,17 +1,26 @@
 "use client";
-import React, { useState } from "react";
-import { LogOut, Menu, Moon, Sun } from "lucide-react";
+import React from "react";
+import { LogOut, Moon, Sun, XIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Switch, SwitchThumb } from "@radix-ui/react-switch";
 import { Button } from "../ui/button";
 import { dashboardLinks } from "@/components/links";
+import { logoutUser } from "@/services/api/user.api";
+import { useCurrentUser } from "@/services/hooks/use-user";
+import { toast } from "sonner";
+import Image from "next/image";
 
-const DashboardSidebar = () => (
+type MobileNavProps = {
+  isMobileNavOpen: boolean;
+  setIsMobileNavOpen: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
+const DashboardSidebar = (props: MobileNavProps) => (
   <>
     <DesktopSidebar />
-    <MobileSidebar />
+    <MobileSidebar {...props} />
   </>
 );
 
@@ -19,12 +28,14 @@ const DesktopSidebar = () => {
   const pathname = usePathname();
 
   return (
-    <nav className="max-md:hidden w-[300px] h-screen shrink-0 overflow-y-auto flex flex-col bg-white">
+    <nav className="max-lg:hidden w-[300px] h-screen shrink-0 overflow-y-auto flex flex-col bg-white">
       <Link href="/">
-        <img
+        <Image
           src="/images/logo.svg"
           alt="Sira Logo"
           className="logo w-16 py-10 mx-auto"
+          width={108}
+          height={33}
         />
       </Link>
 
@@ -34,7 +45,7 @@ const DesktopSidebar = () => {
             <Link
               href={href}
               className={cn(
-                "flex items-center gap-4 p-4 transition duration-300",
+                "flex items-center gap-4 p-4 transition duration-300 text-sm",
                 pathname === href
                   ? "bg-primary text-primary-foreground"
                   : "hover:bg-primary/10"
@@ -50,53 +61,57 @@ const DesktopSidebar = () => {
       <div className="sidebar-footer flex flex-col gap-4 mt-auto">
         <DarkModeToggle />
 
-        <button className="flex items-center gap-4 cursor-pointer p-4 transition duration-300 text-red-700 bg-red-100 hover:bg-red-200">
-          <LogOut />
-          <span>Logout</span>
-        </button>
+        <LogoutButton screen="desktop" />
       </div>
     </nav>
   );
 };
 
-const MobileSidebar = () => {
-  const [collapsed, setCollapsed] = useState(true);
+const MobileSidebar = (props: MobileNavProps) => {
   const pathname = usePathname();
 
   return (
     <div
       className={cn(
-        "md:hidden overflow-y-auto h-screen shrink-0",
-        !collapsed && "fixed inset-0 bg-black/50"
+        "lg:hidden overflow-y-auto h-screen shrink-0",
+        props.isMobileNavOpen && "fixed inset-0 bg-black/50"
       )}
       onClick={(e) => {
         if (
           e.target instanceof HTMLElement &&
           !e.target.closest(".sidebar-mobile")
         ) {
-          setCollapsed(true);
+          props.setIsMobileNavOpen(false);
         }
       }}
     >
       <nav
         className={cn(
           "sidebar-mobile h-full flex flex-col bg-white transition-width duration-300",
-          collapsed ? "w-16" : "w-[300px]"
+          props.isMobileNavOpen ? "w-[300px]" : "w-0"
         )}
       >
         <Button
           variant="outline"
           size="icon"
-          className={cn("mt-4", collapsed ? "mx-auto" : "ml-auto mr-4")}
-          onClick={() => setCollapsed(!collapsed)}
+          className={cn(
+            "mt-4",
+            props.isMobileNavOpen ? "ml-auto mr-4" : "mx-auto"
+          )}
+          onClick={() => props.setIsMobileNavOpen(!props.isMobileNavOpen)}
         >
-          <Menu />
+          <XIcon />
         </Button>
         <Link href="/">
-          <img
+          <Image
             src="/images/logo.svg"
             alt="Sira Logo"
-            className={cn("logo py-5 mx-auto", collapsed ? "w-12" : "w-16")}
+            className={cn(
+              "logo py-5 mx-auto",
+              !props.isMobileNavOpen ? "w-12" : "w-16"
+            )}
+            width={108}
+            height={33}
           />
         </Link>
         <ul>
@@ -109,21 +124,18 @@ const MobileSidebar = () => {
                   pathname === href
                     ? "bg-primary text-primary-foreground"
                     : "hover:bg-primary/10",
-                  collapsed && "justify-center"
+                  !props.isMobileNavOpen && "justify-center"
                 )}
               >
                 {icon}
-                {!collapsed && <span>{name}</span>}
+                {props.isMobileNavOpen && <span>{name}</span>}
               </Link>
             </li>
           ))}
         </ul>
         <div className="sidebar-footer flex flex-col gap-4 mt-auto">
           <DarkModeToggle />
-          <button className="flex max-md:justify-center items-center gap-4 cursor-pointer p-4 transition duration-300 text-red-700 bg-red-100 hover:bg-red-200">
-            <LogOut />
-            {!collapsed && <span>Logout</span>}
-          </button>
+          <LogoutButton screen="mobile" collapsed={props.isMobileNavOpen} />
         </div>
       </nav>
     </div>
@@ -138,5 +150,46 @@ const DarkModeToggle = () => (
     </SwitchThumb>
   </Switch>
 );
+
+const LogoutButton: React.FC<{
+  screen: "desktop" | "mobile";
+  collapsed?: boolean;
+}> = ({ screen, collapsed }) => {
+  const { mutate } = useCurrentUser();
+
+  const handleLogout = async () => {
+    try {
+      toast("Logging out...");
+      await logoutUser();
+      mutate();
+      window.location.assign("/");
+    } catch (error) {
+      console.error("Error logging out", error);
+      toast.error("Error logging out");
+    }
+  };
+
+  if (screen === "desktop") {
+    return (
+      <button
+        onClick={handleLogout}
+        className="flex items-center gap-4 cursor-pointer p-4 transition duration-300 text-red-700 bg-red-100 hover:bg-red-200"
+      >
+        <LogOut />
+        <span>Logout</span>
+      </button>
+    );
+  }
+
+  return (
+    <button
+      onClick={handleLogout}
+      className="flex max-md:justify-center items-center gap-4 cursor-pointer p-4 transition duration-300 text-red-700 bg-red-100 hover:bg-red-200"
+    >
+      <LogOut />
+      {!collapsed && <span>Logout</span>}
+    </button>
+  );
+};
 
 export default DashboardSidebar;

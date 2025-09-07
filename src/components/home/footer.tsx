@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 
@@ -15,10 +16,12 @@ const contactLinks = [
 const Footer = () => {
   return (
     <footer className="section container space-y-4">
-      <img
+      <Image
         src="/images/logo.svg"
         alt="Sira Logo"
         className="logo max-sm:mx-auto"
+        width={108}
+        height={33}
       />
       <hr className="md:hidden" />
 

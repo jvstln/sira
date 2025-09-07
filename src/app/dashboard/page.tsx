@@ -1,6 +1,6 @@
+"use client";
 import { dashboardLinks } from "@/components/links";
 import Link from "next/link";
-import React from "react";
 
 const DashboardHome = () => {
   return (

@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 import React from "react";
 
 const testimonials = [
@@ -74,11 +75,14 @@ const Testimonial: React.FC<
       className
     )}
   >
-    <img
-      src={image}
-      alt=""
-      className="image size-12 object-cover rounded-full mx-auto -mt-6 border border-neutral-300"
-    />
+    <div className="relative size-12">
+      <Image
+        src={image}
+        alt=""
+        className="image size-12 object-cover rounded-full mx-auto -mt-6 border border-neutral-300"
+        fill
+      />
+    </div>
     <p>{description}</p>
     <div className="name font-bold my-auto">
       - {name}, {level}
